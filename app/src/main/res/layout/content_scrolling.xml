@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".Activities.BlankActivity"
+    tools:showIn="@layout/activity_blank_acrivity">
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical"
+       android:padding="10dp">
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="10dp"
+           android:text="Данные клиента:"
+           android:textSize="22dp"/>
+       <EditText
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="10dp"
+           android:textSize="18dp"/>
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="10dp"
+           android:text="Выполненная работа:"
+           android:textSize="22dp"/>
+       <EditText
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="10dp"
+           android:textSize="18dp"/>
+       <TextView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="10dp"
+           android:text="Запчасти"
+           android:textSize="22dp"/>
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="vertical"
+           android:id="@+id/box">
+           <Button
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:id="@+id/addPart"
+               android:onClick="onClick"
+               android:text="Добавить запчасть"
+               android:textAllCaps="false"
+               android:textStyle="bold"
+               android:textColor="@color/purple_700"
+               android:backgroundTint="@color/white"
+               android:layout_marginTop="10dp"/>
+       </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Имя клиента:"
+            android:textSize="22dp"
+            android:layout_marginTop="10dp"/>
+       <EditText
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:layout_marginTop="10dp"
+           android:layout_marginBottom="50dp"
+           android:textSize="18dp"
+           />
+       <RelativeLayout
+           android:layout_width="match_parent"
+           android:layout_height="250dp"/>
+   </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
