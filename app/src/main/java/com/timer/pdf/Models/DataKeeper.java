@@ -3,20 +3,29 @@ package com.timer.pdf.Models;
 import java.util.ArrayList;
 
 public class DataKeeper {
-    String clientData, workDone, clientName;
-    ArrayList<Part> parts;
+    private String clientData, workDone, clientName, email;
+    private ArrayList<Part> parts;
 
-    public DataKeeper(String clientData, String workDone, String clientName, ArrayList<Part> parts) {
+    public DataKeeper(String clientData, String workDone, String clientName, String email, ArrayList<Part> parts) {
         this.clientData = clientData;
         this.workDone = workDone;
         this.clientName = clientName;
         this.parts = parts;
+        this.email = email;
     }
 
-    public DataKeeper(String clientData, String workDone, String clientName) {
+    public DataKeeper(String clientData, String workDone, String clientName, String email) {
         this.clientData = clientData;
         this.workDone = workDone;
         this.clientName = clientName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getClientData() {
