@@ -1,14 +1,22 @@
 package com.timer.pdf.Activities;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,9 +29,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.timer.pdf.Models.Connector;
 import com.timer.pdf.Models.DataKeeper;
+import com.timer.pdf.Models.EmailSender;
+import com.timer.pdf.Models.Generator;
 import com.timer.pdf.Models.Part;
 import com.timer.pdf.R;
 
@@ -37,7 +48,8 @@ public class BlankActivity extends AppCompatActivity {
     int nameId = 100;
     int numberId = 10000;
     int countId = 1000000;
-
+    String timeUsed;
+    ProgressDialog pd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +61,8 @@ public class BlankActivity extends AppCompatActivity {
         int seconds = ((time % 86400) % 3600) % 60;
         int minutes = ((time % 86400) % 3600) / 60;
         int hours = (time % 86400) / 3600;
-        String s = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
-        toolBarLayout.setTitle("Время: " + s);
+        timeUsed = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
+        toolBarLayout.setTitle("Время: " + timeUsed);
 
         addPart = findViewById(R.id.addPart);
         box = findViewById(R.id.box);
@@ -62,22 +74,35 @@ public class BlankActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<Part> parts = new ArrayList<>();
-                for (int i = 1; i < layoutId; i++) {
-                    LinearLayout layout = box.findViewById(i);
-                    EditText name = layout.findViewById(i * 100);
-                    EditText number = layout.findViewById(i * 10000);
-                    EditText count = layout.findViewById(i * 1000000);
-                    Part part = new Part(name.getText() + "", number.getText() + "", count.getText() + "");
-                    parts.add(part);
-                }
+                if (ContextCompat.checkSelfPermission(BlankActivity.this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    ArrayList<Part> parts = new ArrayList<>();
+                    for (int i = 1; i < layoutId; i++) {
+                        LinearLayout layout = box.findViewById(i);
+                        EditText name = layout.findViewById(i * 100);
+                        EditText number = layout.findViewById(i * 10000);
+                        EditText count = layout.findViewById(i * 1000000);
+                        Part part = new Part(name.getText() + "", number.getText() + "", count.getText() + "");
+                        parts.add(part);
+                    }
+                    parts.add(new Part("Knife", "54876", "7"));
                 DataKeeper keeper = new DataKeeper(
                         clientData.getText().toString(),
                         workDone.getText().toString(),
                         clientName.getText().toString(),
                         clientEmail.getText().toString(), parts
                 );
-                Connector.send(keeper);
+//                    DataKeeper keeper = new DataKeeper("Data of client",
+//                            "We done lots of work today. Good job!",
+//                            "Muhammed", "gorbatenkostepan@gmail.com", parts);
+                   new SendTask().execute(keeper);
+
+                    Log.d("click", "clicked");
+                } else {
+                    if(!ActivityCompat.shouldShowRequestPermissionRationale(BlankActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                        ActivityCompat.requestPermissions(BlankActivity.this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                    }
+                }
             }
         });
     }
@@ -114,5 +139,50 @@ public class BlankActivity extends AppCompatActivity {
         count.setHint("Количество");
         layout.addView(count);
         box.addView(layout);
+    }
+
+    private class SendTask extends AsyncTask<DataKeeper, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(BlankActivity.this);
+            pd.setMessage("Сообщение отправляется...");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        @Override
+        protected Void doInBackground(DataKeeper... dataKeepers) {
+            try {
+                EmailSender sender = new EmailSender("pdf.sender.bot@gmail.com", "SenderBot",
+                        "gorbatenkostepan@gmail.com", "message", dataKeepers[0], timeUsed);
+                sender.createEmailMessage();
+                sender.sendEmail();
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            try {
+                if ((pd!= null) && pd.isShowing()) {
+                    pd.dismiss();
+                }
+            }  catch (final Exception e) {
+            } finally {
+                pd = null;
+            }
+            Toast.makeText(BlankActivity.this, "Сообщение отправлено", Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

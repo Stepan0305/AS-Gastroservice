@@ -29,7 +29,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //getSupportActionBar().hide();
+        try {
+            getSupportActionBar().hide();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         txtHours = findViewById(R.id.txtHours);
         txtMinutes = findViewById(R.id.txtMinutes);
         txtSeconds = findViewById(R.id.txtSeconds);
@@ -59,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, BlankActivity.class);
             intent.putExtra("time", time);
             startActivity(intent);
+            finish();
         }
     }
 

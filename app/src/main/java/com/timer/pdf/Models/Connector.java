@@ -3,6 +3,9 @@ package com.timer.pdf.Models;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,15 +27,30 @@ public class Connector {
             jsonObject.put("email", keeper.getEmail());
             jsonObject.put("workDone", keeper.getWorkDone());
             JSONArray array = new JSONArray();
-            ArrayList<Part> parts = keeper.getParts();
-            for (Part p: parts){
-                JSONObject object = new JSONObject();
-                object.put("name", p.getName());
-                object.put("number", p.getNumber());
-                object.put("count", p.getCount());
-                array.put(p);
+//            ArrayList<Part> parts = keeper.getParts();
+//            for (Part p: parts){
+//                JSONObject object = new JSONObject();
+//                object.put("name", p.getName());
+//                object.put("number", p.getNumber());
+//                object.put("count", p.getCount());
+//                array.put(p);
+//            }
+          //  jsonObject.put("parts", array);
+            OutputStream os = con.getOutputStream();
+            byte[] input = jsonObject.toString().getBytes("utf-8");
+            os.write(input);
+            os.flush();
+            os.close();
+
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), "utf-8"));
+            StringBuilder response = new StringBuilder();
+            String responseLine = null;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
             }
-            jsonObject.put("parts", array);
-        } catch (Exception ex){}
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 }
