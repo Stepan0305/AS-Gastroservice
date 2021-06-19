@@ -8,89 +8,141 @@
     tools:context=".Activities.BlankActivity"
     tools:showIn="@layout/activity_blank_acrivity">
 
-   <LinearLayout
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:orientation="vertical"
-       android:padding="10dp">
-       <TextView
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginTop="10dp"
-           android:text="Данные клиента:"
-           android:textSize="22dp"/>
-       <EditText
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:id="@+id/clientData"
-           android:layout_marginTop="10dp"
-           android:textSize="18dp"/>
-       <TextView
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginTop="10dp"
-           android:text="Выполненная работа:"
-           android:textSize="22dp"/>
-       <EditText
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:id="@+id/workMade"
-           android:layout_marginTop="10dp"
-           android:textSize="18dp"/>
-       <TextView
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
 
-           android:layout_marginTop="10dp"
-           android:text="Запчасти"
-           android:textSize="22dp"/>
-       <LinearLayout
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:orientation="vertical"
-           android:id="@+id/box">
-           <Button
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:id="@+id/addPart"
-               android:onClick="onClick"
-               android:text="Добавить запчасть"
-               android:textAllCaps="false"
-               android:textStyle="bold"
-               android:textColor="@color/purple_700"
-               android:backgroundTint="@color/white"
-               android:layout_marginTop="10dp"/>
-       </LinearLayout>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Имя клиента:"
-            android:textSize="22dp"
-            android:layout_marginTop="10dp"/>
-       <EditText
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:id="@+id/clientName"
-           android:layout_marginTop="10dp"
-           android:textSize="18dp"
-           />
-       <TextView
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="Email:"
-           android:textSize="22dp"
-           android:layout_marginTop="10dp"/>
-       <EditText
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:id="@+id/clientEmail"
-           android:layout_marginTop="10dp"
-           android:layout_marginBottom="50dp"
-           android:textSize="18dp"
-           />
-       <RelativeLayout
-           android:layout_width="match_parent"
-           android:layout_height="250dp"/>
-   </LinearLayout>
+            android:layout_marginTop="10dp"
+            android:text="Kundendaten:"
+            android:textSize="22dp" />
+
+        <EditText
+            android:id="@+id/clientData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="18dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Durchgeführte Arbeiten:"
+            android:textSize="22dp" />
+
+        <EditText
+            android:id="@+id/workMade"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="18dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="10dp"
+            android:text="Ersatzteile:"
+            android:textSize="22dp" />
+
+        <LinearLayout
+            android:id="@+id/box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/addPart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="@color/white"
+                android:onClick="onClick"
+                android:text="Teil hinzufügen"
+                android:textAllCaps="false"
+                android:textColor="@color/purple_700"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Kundenname:"
+            android:textSize="22dp" />
+
+        <EditText
+            android:id="@+id/clientName"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:textSize="18dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Email:"
+            android:textSize="22dp" />
+
+        <EditText
+            android:id="@+id/clientEmail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="15dp"
+            android:textSize="18dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Ort/Datum:"
+            android:textSize="22dp" />
+        <EditText
+            android:id="@+id/timePlace"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="15dp"
+            android:textSize="18dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Auftrags-Nr:"
+            android:textSize="22dp" />
+        <EditText
+            android:id="@+id/orderNum"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="15dp"
+            android:textSize="18dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Abgeschlossen:"
+                android:textSize="22dp" />
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/yesNo"
+                android:layout_marginStart="20dp"/>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="250dp" />
+    </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

@@ -15,11 +15,15 @@
         android:roundIcon="@drawable/icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.Timer">
+        <activity android:name=".Activities.ChangeDataActivity"></activity>
+        <activity android:name=".Activities.SignatureActivity2" />
+        <activity android:name=".Activities.SignatureActivity" />
         <activity
             android:name=".Activities.SplashActivity"
             android:theme="@style/Theme.Timer.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -27,9 +31,7 @@
             android:name=".Activities.BlankActivity"
             android:label="@string/title_activity_blank_acrivity"
             android:theme="@style/Theme.Timer.NoActionBar" />
-        <activity android:name=".Activities.MainActivity">
-
-        </activity>
+        <activity android:name=".Activities.MainActivity" />
     </application>
 
 </manifest>

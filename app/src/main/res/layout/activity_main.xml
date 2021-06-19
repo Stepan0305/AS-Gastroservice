@@ -88,12 +88,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:onClick="onClick"
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="24dp"
             android:layout_marginBottom="24dp"
             android:backgroundTint="@color/white"
+            android:onClick="onClick"
             app:srcCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+            tools:ignore="VectorDrawableCompat" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="@color/white"
+            android:onClick="onClick"
+            app:srcCompat="@drawable/ic_baseline_settings_24"
             tools:ignore="VectorDrawableCompat" />
     </RelativeLayout>
 </LinearLayout>

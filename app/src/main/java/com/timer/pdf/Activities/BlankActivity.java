@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -26,13 +28,16 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.timer.pdf.Models.Connector;
 import com.timer.pdf.Models.DataKeeper;
+import com.timer.pdf.Models.DataKeeperKeeper;
 import com.timer.pdf.Models.EmailSender;
 import com.timer.pdf.Models.Generator;
 import com.timer.pdf.Models.Part;
@@ -43,13 +48,15 @@ import java.util.ArrayList;
 public class BlankActivity extends AppCompatActivity {
     Button addPart;
     ViewGroup box;
-    EditText clientData, workDone, clientName, clientEmail;
+    EditText clientData, workDone, clientName, clientEmail, timePlace, orderNum;
     int layoutId = 1;
     int nameId = 100;
     int numberId = 10000;
     int countId = 1000000;
     String timeUsed;
-    ProgressDialog pd;
+    Switch yesNo;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,46 +69,57 @@ public class BlankActivity extends AppCompatActivity {
         int minutes = ((time % 86400) % 3600) / 60;
         int hours = (time % 86400) / 3600;
         timeUsed = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
-        toolBarLayout.setTitle("Время: " + timeUsed);
-
+        toolBarLayout.setTitle("Zeit: " + timeUsed);
+        DataKeeperKeeper.keeper = new DataKeeper();
+        if ( !PreferenceManager.getDefaultSharedPreferences(this).getString("ourData", "no").equals("no") ){
+            DataKeeperKeeper.keeper.setOurData(PreferenceManager.getDefaultSharedPreferences(this).getString("ourData", "no"));
+        }
         addPart = findViewById(R.id.addPart);
         box = findViewById(R.id.box);
         clientData = findViewById(R.id.clientData);
         clientName = findViewById(R.id.clientName);
         workDone = findViewById(R.id.workMade);
         clientEmail = findViewById(R.id.clientEmail);
+        timePlace = findViewById(R.id.timePlace);
+        orderNum = findViewById(R.id.orderNum);
+        yesNo = findViewById(R.id.yesNo);
+        yesNo.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                DataKeeperKeeper.keeper.setFinished(isChecked);
+
+            }
+        });
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(BlankActivity.this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    ArrayList<Part> parts = new ArrayList<>();
-                    for (int i = 1; i < layoutId; i++) {
-                        LinearLayout layout = box.findViewById(i);
-                        EditText name = layout.findViewById(i * 100);
-                        EditText number = layout.findViewById(i * 10000);
-                        EditText count = layout.findViewById(i * 1000000);
-                        Part part = new Part(name.getText() + "", number.getText() + "", count.getText() + "");
-                        parts.add(part);
-                    }
-                    parts.add(new Part("Knife", "54876", "7"));
-                DataKeeper keeper = new DataKeeper(
-                        clientData.getText().toString(),
-                        workDone.getText().toString(),
-                        clientName.getText().toString(),
-                        clientEmail.getText().toString(), parts
-                );
-//                    DataKeeper keeper = new DataKeeper("Data of client",
-//                            "We done lots of work today. Good job!",
-//                            "Muhammed", "gorbatenkostepan@gmail.com", parts);
-                   new SendTask().execute(keeper);
 
-                    Log.d("click", "clicked");
+                ArrayList<Part> parts = new ArrayList<>();
+                for (int i = 1; i < layoutId; i++) {
+                    LinearLayout layout = box.findViewById(i);
+                    EditText name = layout.findViewById(i * 100);
+                    EditText number = layout.findViewById(i * 10000);
+                    EditText count = layout.findViewById(i * 1000000);
+                    Part part = new Part(name.getText() + "", number.getText() + "", count.getText() + "");
+                    parts.add(part);
+                }
+                if (!(clientData.getText().toString().isEmpty() || workDone.getText().toString().isEmpty() ||
+                        clientName.getText().toString().isEmpty() || clientEmail.getText().toString().isEmpty())) {
+
+                    DataKeeperKeeper.keeper.setClientData(clientData.getText().toString());
+                    DataKeeperKeeper.keeper.setWorkDone(workDone.getText().toString());
+                    DataKeeperKeeper.keeper.setClientName(clientName.getText().toString());
+                    DataKeeperKeeper.keeper.setEmail(clientEmail.getText().toString());
+                    DataKeeperKeeper.keeper.setParts(parts);
+                    DataKeeperKeeper.keeper.setTimePlace(timePlace.getText().toString());
+                    DataKeeperKeeper.keeper.setOrderNum(orderNum.getText().toString());
+                    Intent i = new Intent(BlankActivity.this, SignatureActivity.class);
+                    startActivity(i);
+                    finish();
                 } else {
-                    if(!ActivityCompat.shouldShowRequestPermissionRationale(BlankActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-                        ActivityCompat.requestPermissions(BlankActivity.this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                    }
+                    Toast.makeText(BlankActivity.this, "Füllen Sie alle Details aus!", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -122,67 +140,22 @@ public class BlankActivity extends AppCompatActivity {
         Log.d("id", name.getId() + "");
         name.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.4), LinearLayout.LayoutParams.WRAP_CONTENT));
         name.setTextSize(16);
-        name.setHint("Название");
+        name.setHint("Name");
         layout.addView(name);
         EditText number = new EditText(this);
         number.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.3), LinearLayout.LayoutParams.WRAP_CONTENT));
         number.setId(numberId);
         numberId += 10000;
         number.setTextSize(16);
-        number.setHint("Номер");
+        number.setHint("Ersatzteile Nummer");
         layout.addView(number);
         EditText count = new EditText(this);
         count.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.3), LinearLayout.LayoutParams.WRAP_CONTENT));
         count.setId(countId);
         countId += 1000000;
         count.setTextSize(16);
-        count.setHint("Количество");
+        count.setHint("Menge");
         layout.addView(count);
         box.addView(layout);
-    }
-
-    private class SendTask extends AsyncTask<DataKeeper, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pd = new ProgressDialog(BlankActivity.this);
-            pd.setMessage("Сообщение отправляется...");
-            pd.setCancelable(false);
-            pd.show();
-        }
-
-        @Override
-        protected Void doInBackground(DataKeeper... dataKeepers) {
-            try {
-                EmailSender sender = new EmailSender("pdf.sender.bot@gmail.com", "SenderBot",
-                        "gorbatenkostepan@gmail.com", "message", dataKeepers[0], timeUsed);
-                sender.createEmailMessage();
-                sender.sendEmail();
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            try {
-                if ((pd!= null) && pd.isShowing()) {
-                    pd.dismiss();
-                }
-            }  catch (final Exception e) {
-            } finally {
-                pd = null;
-            }
-            Toast.makeText(BlankActivity.this, "Сообщение отправлено", Toast.LENGTH_LONG).show();
-            finish();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

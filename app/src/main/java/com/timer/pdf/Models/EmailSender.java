@@ -11,8 +11,10 @@ import java.security.Security;
 import java.util.List;
 import java.util.Properties;
 
+import javax.activation.CommandMap;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.activation.MailcapCommandMap;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -37,24 +39,19 @@ public class EmailSender {
     String toEmail;
     String emailSubject;
     DataKeeper keeper;
-    String time;
 
     Properties emailProperties;
     Session mailSession;
     MimeMessage emailMessage;
 
-    public EmailSender() {
-
-    }
 
     public EmailSender(String fromEmail, String fromPassword,
-                       String toEmail, String emailSubject, DataKeeper keeper, String time) {
+                       String toEmail, String emailSubject, DataKeeper keeper) {
         this.fromEmail = fromEmail;
         this.fromPassword = fromPassword;
         this.toEmail = toEmail;
         this.emailSubject = emailSubject;
         this.keeper = keeper;
-        this.time = time;
         emailProperties = System.getProperties();
         emailProperties.put("mail.smtp.port", emailPort);
         emailProperties.put("mail.smtp.auth", smtpAuth);
@@ -67,6 +64,12 @@ public class EmailSender {
 
         mailSession = Session.getDefaultInstance(emailProperties, null);
         emailMessage = new MimeMessage(mailSession);
+        MailcapCommandMap mc = (MailcapCommandMap) CommandMap.getDefaultCommandMap();
+        mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
+        mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");
+        mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
+        mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
+        mc.addMailcap("message/rfc822;; x-java-content- handler=com.sun.mail.handlers.message_rfc822");
 
         emailMessage.setFrom(new InternetAddress(fromEmail, fromEmail));
 
@@ -78,7 +81,7 @@ public class EmailSender {
         emailMessage.setSubject(emailSubject);
         MimeMultipart multipart = new MimeMultipart();
         MimeBodyPart attachment = new MimeBodyPart();
-        attachment.attachFile(Generator.generate(keeper, time));
+        attachment.attachFile(Generator.generate(keeper));
         multipart.addBodyPart(attachment);
         emailMessage.setContent(multipart);
         Log.i("GMail", "Email Message created.");

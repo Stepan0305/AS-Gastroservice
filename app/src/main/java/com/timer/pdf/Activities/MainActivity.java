@@ -7,9 +7,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.timer.pdf.Models.PaintView;
 import com.timer.pdf.R;
 
 import java.util.Objects;
@@ -19,7 +21,7 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
     TextView txtHours, txtMinutes, txtSeconds;
     Button btnSet, btnReset;
-    FloatingActionButton btnNext;
+    FloatingActionButton btnNext, btnSettings;
     boolean timerStarted = false;
     Timer timer;
     TimerTask timerTask;
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         btnSet = findViewById(R.id.btnSet);
         btnReset = findViewById(R.id.btnReset);
         btnNext = findViewById(R.id.btnNext);
+        btnSettings = findViewById(R.id.btnSettings);
         timer = new Timer();
     }
 
@@ -64,6 +67,9 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("time", time);
             startActivity(intent);
             finish();
+        } else if (v.getId() == btnSettings.getId()) {
+            Intent i = new Intent(MainActivity.this, ChangeDataActivity.class);
+            startActivity(i);
         }
     }
 

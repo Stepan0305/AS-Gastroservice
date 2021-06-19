@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="25dp"
+    android:orientation="vertical">
+<TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Unterschrift Kunde:"
+    android:textSize="24dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:gravity="center"
+        android:padding="25dp">
+
+        <ImageButton
+            android:id="@+id/btnClear2"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:backgroundTint="@color/teal_200"
+            android:onClick="onTap2"
+            android:src="@drawable/ic_baseline_replay_24" />
+
+        <ImageButton
+            android:id="@+id/btnConfirm2"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:backgroundTint="@color/teal_200"
+            android:onClick="onTap2"
+            android:src="@drawable/ic_baseline_send_24" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/paintBox2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" />
+
+</LinearLayout>
