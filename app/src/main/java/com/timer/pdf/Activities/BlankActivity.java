@@ -70,10 +70,6 @@ public class BlankActivity extends AppCompatActivity {
         int hours = (time % 86400) / 3600;
         timeUsed = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
         toolBarLayout.setTitle("Zeit: " + timeUsed);
-        DataKeeperKeeper.keeper = new DataKeeper();
-        if ( !PreferenceManager.getDefaultSharedPreferences(this).getString("ourData", "no").equals("no") ){
-            DataKeeperKeeper.keeper.setOurData(PreferenceManager.getDefaultSharedPreferences(this).getString("ourData", "no"));
-        }
         addPart = findViewById(R.id.addPart);
         box = findViewById(R.id.box);
         clientData = findViewById(R.id.clientData);
@@ -106,7 +102,7 @@ public class BlankActivity extends AppCompatActivity {
                     parts.add(part);
                 }
                 if (!(clientData.getText().toString().isEmpty() || workDone.getText().toString().isEmpty() ||
-                        clientName.getText().toString().isEmpty() || clientEmail.getText().toString().isEmpty())) {
+                        clientName.getText().toString().isEmpty())) {
 
                     DataKeeperKeeper.keeper.setClientData(clientData.getText().toString());
                     DataKeeperKeeper.keeper.setWorkDone(workDone.getText().toString());
@@ -117,7 +113,6 @@ public class BlankActivity extends AppCompatActivity {
                     DataKeeperKeeper.keeper.setOrderNum(orderNum.getText().toString());
                     Intent i = new Intent(BlankActivity.this, SignatureActivity.class);
                     startActivity(i);
-                    finish();
                 } else {
                     Toast.makeText(BlankActivity.this, "Füllen Sie alle Details aus!", Toast.LENGTH_LONG).show();
                 }
@@ -141,17 +136,23 @@ public class BlankActivity extends AppCompatActivity {
         name.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.4), LinearLayout.LayoutParams.WRAP_CONTENT));
         name.setTextSize(16);
         name.setHint("Name");
+        name.setTextColor(getResources().getColor(R.color.black));
+        name.setHintTextColor(getResources().getColor(R.color.black));
         layout.addView(name);
         EditText number = new EditText(this);
         number.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.3), LinearLayout.LayoutParams.WRAP_CONTENT));
         number.setId(numberId);
+        number.setTextColor(getResources().getColor(R.color.black));
         numberId += 10000;
         number.setTextSize(16);
         number.setHint("Ersatzteile Nummer");
+        number.setHintTextColor(getResources().getColor(R.color.black));
         layout.addView(number);
         EditText count = new EditText(this);
         count.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.3), LinearLayout.LayoutParams.WRAP_CONTENT));
         count.setId(countId);
+        count.setTextColor(getResources().getColor(R.color.black));
+        count.setHintTextColor(getResources().getColor(R.color.black));
         countId += 1000000;
         count.setTextSize(16);
         count.setHint("Menge");

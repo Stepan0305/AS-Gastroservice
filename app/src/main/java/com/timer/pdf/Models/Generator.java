@@ -1,7 +1,9 @@
 package com.timer.pdf.Models;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.util.Log;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -19,6 +21,8 @@ import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
+import com.timer.pdf.Activities.MainActivity;
+import com.timer.pdf.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -32,7 +36,7 @@ import java.util.stream.Stream;
 
 public class Generator {
     private static final DeviceRgb WHITE = new DeviceRgb(255, 255, 255);
-    private static final DeviceRgb BLUE = new DeviceRgb(0, 0, 255);
+    private static final DeviceRgb BLACK = new DeviceRgb(0, 0, 0);
 
     public static File generate(DataKeeper keeper) {
         try {
@@ -43,6 +47,18 @@ public class Generator {
             PageSize a4 = PageSize.A4;
             pdfDocument.setDefaultPageSize(a4);
             Document document = new Document(pdfDocument);
+            Table header = new Table(new float[]{(float) (a4.getWidth() * 0.7), (float) (a4.getWidth() * 0.3)});
+            Cell headerCell = new Cell();
+            headerCell.setBorder(new GrooveBorder(WHITE, 0));
+            header.addCell(headerCell);
+            Image img = new Image(ImageDataFactory.create(path + "/logo.png"));
+            img.setHeight(45);
+            headerCell = new Cell();
+            headerCell.setPadding(25);
+            headerCell.setBorder(new GrooveBorder(WHITE, 0));
+            headerCell.add(img);
+            header.addCell(headerCell);
+            document.add(header);
             Table table1 = new Table(new float[]{a4.getWidth() / 2, a4.getWidth() / 2});
             Stream.of("Unsere Daten:", "Kundendaten:")
                     .forEach(el -> {
@@ -56,7 +72,7 @@ public class Generator {
                     .forEach(el -> {
                         Cell cell = new Cell();
                         cell.setPadding(10);
-                        cell.setBorder(new GrooveBorder(BLUE, 2));
+                        cell.setBorder(new GrooveBorder(BLACK, 2));
                         cell.add(new Paragraph(el));
                         table1.addCell(cell);
                     });
@@ -79,7 +95,7 @@ public class Generator {
 
             table2Cell = new Cell();
             table2Cell.setPadding(10);
-            table2Cell.setBorder(new GrooveBorder(BLUE, 2));
+            table2Cell.setBorder(new GrooveBorder(BLACK, 2));
             table2Cell.add(new Paragraph(keeper.getWorkDone()));
             table2.addCell(table2Cell);
 
@@ -101,7 +117,7 @@ public class Generator {
                         .forEach(el -> {
                             Cell cell = new Cell();
                             cell.setPadding(10);
-                            cell.setBorder(new GrooveBorder(BLUE, 2));
+                            cell.setBorder(new GrooveBorder(BLACK, 2));
                             cell.add(new Paragraph(el));
                             table3.addCell(cell);
                         });
@@ -111,7 +127,7 @@ public class Generator {
             Table table4 = new Table(new float[]{a4.getWidth() / 2, a4.getWidth() / 2});
             table4.setMarginTop(10);
             String solution;
-            if (DataKeeperKeeper.keeper.isFinished()){
+            if (DataKeeperKeeper.keeper.isFinished()) {
                 solution = "JA";
             } else solution = "NEIN";
             Stream.of("Abgeschlossen: " + solution, "Ort/Datum: " + keeper.getTimePlace())
@@ -119,13 +135,13 @@ public class Generator {
                         Cell cell = new Cell();
                         cell.setPadding(10);
                         cell.setPaddingBottom(25);
-                        cell.setBorder(new GrooveBorder(BLUE, 2));
+                        cell.setBorder(new GrooveBorder(BLACK, 2));
                         cell.add(new Paragraph(el));
                         table4.addCell(cell);
                     });
             Cell table4Cell = new Cell();
             table4Cell.setPadding(10);
-            table4Cell.setBorder(new GrooveBorder(BLUE, 2));
+            table4Cell.setBorder(new GrooveBorder(BLACK, 2));
             createFile(DataKeeperKeeper.keeper.getClientSignature(), path + "/client.png");
             ImageData data = ImageDataFactory.create(path + "/client.png");
             Image image = new Image(data);
@@ -137,7 +153,7 @@ public class Generator {
 
             table4Cell = new Cell();
             table4Cell.setPadding(10);
-            table4Cell.setBorder(new GrooveBorder(BLUE, 2));
+            table4Cell.setBorder(new GrooveBorder(BLACK, 2));
             createFile(DataKeeperKeeper.keeper.getOurSignature(), path + "/our.png");
             data = ImageDataFactory.create(path + "/our.png");
             image = new Image(data);
@@ -158,7 +174,6 @@ public class Generator {
             table5.addCell(table5Cell);
 
             table5Cell = new Cell();
-            table5Cell.setPadding(10);
             table5Cell.setBorder(new GrooveBorder(WHITE, 0));
             table5Cell.add(new Paragraph("Name Kunde:"));
             table5.addCell(table5Cell);
@@ -170,9 +185,8 @@ public class Generator {
             table5.addCell(table5Cell);
 
             table5Cell = new Cell();
-            table5Cell.setBorder(new GrooveBorder(WHITE, 0));
+            table5Cell.setBorder(new GrooveBorder(BLACK, 2));
             table5Cell.setPadding(10);
-            table5Cell.setBorderBottom(new GrooveBorder(BLUE, 2));
             table5Cell.add(new Paragraph(keeper.getClientName()));
             table5.addCell(table5Cell);
 
@@ -185,14 +199,15 @@ public class Generator {
         }
         return null;
     }
-    private static void createFile(Bitmap bitmap, String path) throws IOException {
+
+    public static void createFile(Bitmap bitmap, String path) throws IOException {
         File f = new File(path);
         f.createNewFile();
-
+        Log.d(path, bitmap.getAllocationByteCount() + "");
         //Convert bitmap to byte array
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0 , bos);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 50, bos);
         byte[] bitmapdata = bos.toByteArray();
 
         //write the bytes in file

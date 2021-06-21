@@ -26,18 +26,24 @@ import com.timer.pdf.R;
 public class SignatureActivity2 extends AppCompatActivity {
     LinearLayout paintBox;
     PaintView paintView;
-    ImageButton btnClear, btnConfirm;
+    ImageButton btnClear, btnConfirm, btnBack;
     ProgressDialog pd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signature2);
+        try {
+            getSupportActionBar().hide();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         paintBox = findViewById(R.id.paintBox2);
         paintView = new PaintView(this);
         paintView.setBackgroundColor(Color.BLACK);
         paintBox.addView(paintView);
         btnClear = findViewById(R.id.btnClear2);
         btnConfirm = findViewById(R.id.btnConfirm2);
+        btnBack = findViewById(R.id.btnBack2);
     }
 
     public void onTap2(View v){
@@ -46,6 +52,7 @@ public class SignatureActivity2 extends AppCompatActivity {
             paintView.invalidate();
         } else if (v.getId() == btnConfirm.getId()){
             DataKeeperKeeper.keeper.setOurSignature(paintView.viewToBitmap(paintView));
+            //запрос разрешений
             if (ContextCompat.checkSelfPermission(SignatureActivity2.this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 new SendTask().execute(DataKeeperKeeper.keeper);
@@ -54,6 +61,8 @@ public class SignatureActivity2 extends AppCompatActivity {
                     ActivityCompat.requestPermissions(SignatureActivity2.this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 }
             }
+        } else if (v.getId() == btnBack.getId()){
+            finish();
         }
     }
 
@@ -93,6 +102,8 @@ public class SignatureActivity2 extends AppCompatActivity {
                 pd = null;
             }
             Toast.makeText(SignatureActivity2.this, "Сообщение отправлено", Toast.LENGTH_LONG).show();
+            Intent i = new Intent(SignatureActivity2.this, MainActivity.class);
+            startActivity(i);
             finish();
         }
     }

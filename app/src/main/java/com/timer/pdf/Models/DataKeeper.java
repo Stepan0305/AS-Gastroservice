@@ -8,25 +8,21 @@ public class DataKeeper {
     private String clientData, workDone, clientName, email, timePlace, orderNum, ourData = "Skolin, Aleksandr & Steinbock, Andrej GbR\n" +
             "\n" +
             "Wüstenhöferstrasse 191\n" +
-            "45355 Essen";
+            "45355 Essen",
+            ourEmail = "vskolin@as-gastroservice.de";
     private ArrayList<Part> parts;
     private Bitmap clientSignature, ourSignature;
     private boolean finished;
 
-    public DataKeeper(String clientData, String workDone, String clientName, String email,
-                      ArrayList<Part> parts, boolean finished, String ourData, String timePlace, String orderNum) {
-        this.clientData = clientData;
-        this.workDone = workDone;
-        this.clientName = clientName;
-        this.parts = parts;
-        this.email = email;
-        this.finished = finished;
-        this.ourData = ourData;
-        this.timePlace = timePlace;
-        this.orderNum = orderNum;
-    }
-    public DataKeeper(){
 
+    public DataKeeper(){}
+
+    public String getOurEmail() {
+        return ourEmail;
+    }
+
+    public void setOurEmail(String ourEmail) {
+        this.ourEmail = ourEmail;
     }
 
     public String getOrderNum() {

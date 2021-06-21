@@ -1,9 +1,16 @@
 package com.timer.pdf.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -11,9 +18,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.timer.pdf.Models.DataKeeper;
+import com.timer.pdf.Models.DataKeeperKeeper;
+import com.timer.pdf.Models.Generator;
 import com.timer.pdf.Models.PaintView;
 import com.timer.pdf.R;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -33,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         try {
             getSupportActionBar().hide();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         txtHours = findViewById(R.id.txtHours);
@@ -44,6 +55,29 @@ public class MainActivity extends AppCompatActivity {
         btnNext = findViewById(R.id.btnNext);
         btnSettings = findViewById(R.id.btnSettings);
         timer = new Timer();
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        try {
+            Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.logo_big);
+            Generator.createFile(
+                    b,
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/logo.png"
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        DataKeeperKeeper.keeper = new DataKeeper();
+        if ( !PreferenceManager.getDefaultSharedPreferences(this).getString("ourData", "no").equals("no") ){
+            DataKeeperKeeper.keeper.setOurData(PreferenceManager.getDefaultSharedPreferences(this).getString("ourData", "no"));
+        }
+        if ( !PreferenceManager.getDefaultSharedPreferences(this).getString("ourEmail", "no").equals("no") ){
+            DataKeeperKeeper.keeper.setOurEmail(PreferenceManager.getDefaultSharedPreferences(this).getString("ourEmail", "no"));
+        }
     }
 
     public void onClick(View v) {
@@ -62,11 +96,12 @@ public class MainActivity extends AppCompatActivity {
             time = 0.0;
             updateTimer();
         } else if (v.getId() == btnNext.getId()) {
-            timer.cancel();
+            if (timerTask != null) {
+                timerTask.cancel();
+            }
             Intent intent = new Intent(MainActivity.this, BlankActivity.class);
             intent.putExtra("time", time);
             startActivity(intent);
-            finish();
         } else if (v.getId() == btnSettings.getId()) {
             Intent i = new Intent(MainActivity.this, ChangeDataActivity.class);
             startActivity(i);
@@ -74,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startTimer() {
+        //вложенность, чтоб работал при выходе из приложения
         timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -90,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateTimer() {
+        //формулы из интернета
         int rounded = (int) Math.round(time);
         int seconds = ((rounded % 86400) % 3600) % 60;
         int minutes = ((rounded % 86400) % 3600) / 60;
@@ -110,5 +147,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             txtHours.setText(hours + ":");
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

