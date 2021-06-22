@@ -27,9 +27,11 @@ import android.view.Display;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.ViewManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
@@ -53,6 +55,7 @@ public class BlankActivity extends AppCompatActivity {
     int nameId = 100;
     int numberId = 10000;
     int countId = 1000000;
+    int deleteId = 100000000;
     String timeUsed;
     Switch yesNo;
 
@@ -95,11 +98,13 @@ public class BlankActivity extends AppCompatActivity {
                 ArrayList<Part> parts = new ArrayList<>();
                 for (int i = 1; i < layoutId; i++) {
                     LinearLayout layout = box.findViewById(i);
-                    EditText name = layout.findViewById(i * 100);
-                    EditText number = layout.findViewById(i * 10000);
-                    EditText count = layout.findViewById(i * 1000000);
-                    Part part = new Part(name.getText() + "", number.getText() + "", count.getText() + "");
-                    parts.add(part);
+                    if (layout != null) {
+                        EditText name = layout.findViewById(i * 100);
+                        EditText number = layout.findViewById(i * 10000);
+                        EditText count = layout.findViewById(i * 1000000);
+                        Part part = new Part(name.getText() + "", number.getText() + "", count.getText() + "");
+                        parts.add(part);
+                    }
                 }
                 if (!(clientData.getText().toString().isEmpty() || workDone.getText().toString().isEmpty() ||
                         clientName.getText().toString().isEmpty())) {
@@ -133,30 +138,40 @@ public class BlankActivity extends AppCompatActivity {
         name.setId(nameId);
         nameId += 100;
         Log.d("id", name.getId() + "");
-        name.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.4), LinearLayout.LayoutParams.WRAP_CONTENT));
-        name.setTextSize(16);
+        name.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.35), LinearLayout.LayoutParams.WRAP_CONTENT));
+        name.setTextSize(12);
         name.setHint("Name");
         name.setTextColor(getResources().getColor(R.color.black));
         name.setHintTextColor(getResources().getColor(R.color.black));
         layout.addView(name);
         EditText number = new EditText(this);
-        number.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.3), LinearLayout.LayoutParams.WRAP_CONTENT));
+        number.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.25), LinearLayout.LayoutParams.WRAP_CONTENT));
         number.setId(numberId);
         number.setTextColor(getResources().getColor(R.color.black));
         numberId += 10000;
-        number.setTextSize(16);
+        number.setTextSize(12);
         number.setHint("Ersatzteile Nummer");
         number.setHintTextColor(getResources().getColor(R.color.black));
         layout.addView(number);
         EditText count = new EditText(this);
-        count.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.3), LinearLayout.LayoutParams.WRAP_CONTENT));
+        count.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.25), LinearLayout.LayoutParams.WRAP_CONTENT));
         count.setId(countId);
         count.setTextColor(getResources().getColor(R.color.black));
         count.setHintTextColor(getResources().getColor(R.color.black));
         countId += 1000000;
-        count.setTextSize(16);
+        count.setTextSize(12);
         count.setHint("Menge");
         layout.addView(count);
+        ImageButton delete = new ImageButton(this);
+        delete.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.08), (int)(width * 0.08)));
+        delete.setBackgroundColor(getResources().getColor(R.color.red));
+        delete.setId(deleteId);
+        deleteId += 100000000;
+        delete.setImageResource(R.drawable.ic_baseline_close_24);
+        delete.setOnClickListener(btn -> {
+            ((ViewManager)btn.getParent().getParent()).removeView(layout);
+        });
+        layout.addView(delete);
         box.addView(layout);
     }
 }
