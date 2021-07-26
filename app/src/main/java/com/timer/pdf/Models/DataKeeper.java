@@ -11,7 +11,7 @@ public class DataKeeper {
             "45355 Essen",
             ourEmail = "vskolin@as-gastroservice.de";
     private ArrayList<Part> parts;
-    private Bitmap clientSignature, ourSignature;
+    private Bitmap clientSignature, ourSignature = null;
     private boolean finished;
 
 

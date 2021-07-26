@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         btnNext = findViewById(R.id.btnNext);
         btnSettings = findViewById(R.id.btnSettings);
         timer = new Timer();
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
         try {
             Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.logo_big);
             Generator.createFile(
@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         DataKeeperKeeper.keeper = new DataKeeper();
+        DataKeeperKeeper.currentFile = null;
         if ( !PreferenceManager.getDefaultSharedPreferences(this).getString("ourData", "no").equals("no") ){
             DataKeeperKeeper.keeper.setOurData(PreferenceManager.getDefaultSharedPreferences(this).getString("ourData", "no"));
         }

@@ -31,17 +31,30 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 
 public class Generator {
     private static final DeviceRgb WHITE = new DeviceRgb(255, 255, 255);
     private static final DeviceRgb BLACK = new DeviceRgb(0, 0, 0);
-
+    static String currentName = "default";
     public static File generate(DataKeeper keeper) {
         try {
             String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
-            File file = new File(path, "letter.pdf");
+            File folder = new File(path + File.separator + "GeneratedFiles");
+            boolean success = true;
+            if (!folder.exists()) {
+                success = folder.mkdirs();
+            }
+            currentName = getFileName();
+            File file = null;
+            if (success) {
+                file = new File(path + "/GeneratedFiles/" + currentName);
+            } else {
+                file = new File(path , currentName);
+            }
             PdfWriter writer = new PdfWriter(file);
             PdfDocument pdfDocument = new PdfDocument(writer);
             PageSize a4 = PageSize.A4;
@@ -215,5 +228,14 @@ public class Generator {
         fos.write(bitmapdata);
         fos.flush();
         fos.close();
+    }
+    private static String getFileName(){
+        String res = new SimpleDateFormat("dd-MM-yyyy HH.mm.ss", Locale.getDefault()).format(new Date());
+//        for (int i = 0; i < 10; i++) {
+//            int randomNum = new Random().nextInt(123 - 97) + 97;
+//            res += (char)randomNum;
+//        }
+        res += ".pdf";
+        return res;
     }
 }

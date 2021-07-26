@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -56,8 +57,10 @@ public class BlankActivity extends AppCompatActivity {
     int numberId = 10000;
     int countId = 1000000;
     int deleteId = 100000000;
+    int width;
     String timeUsed;
     Switch yesNo;
+    LinearLayout layout;
 
 
     @Override
@@ -71,6 +74,8 @@ public class BlankActivity extends AppCompatActivity {
         int seconds = ((time % 86400) % 3600) % 60;
         int minutes = ((time % 86400) % 3600) / 60;
         int hours = (time % 86400) / 3600;
+        Display display = getWindowManager().getDefaultDisplay();
+        width = display.getWidth();
         timeUsed = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
         toolBarLayout.setTitle("Zeit: " + timeUsed);
         addPart = findViewById(R.id.addPart);
@@ -125,10 +130,14 @@ public class BlankActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
     @SuppressLint("ResourceType")
     public void onClick(View v) {
-        Display display = getWindowManager().getDefaultDisplay();
-        int width = display.getWidth();
         LinearLayout layout = new LinearLayout(this);
         layout.setId(layoutId);
         layoutId++;
@@ -163,15 +172,17 @@ public class BlankActivity extends AppCompatActivity {
         count.setHint("Menge");
         layout.addView(count);
         ImageButton delete = new ImageButton(this);
-        delete.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.08), (int)(width * 0.08)));
+        delete.setLayoutParams(new LinearLayout.LayoutParams((int) (width * 0.08), (int) (width * 0.08)));
         delete.setBackgroundColor(getResources().getColor(R.color.red));
         delete.setId(deleteId);
         deleteId += 100000000;
         delete.setImageResource(R.drawable.ic_baseline_close_24);
         delete.setOnClickListener(btn -> {
-            ((ViewManager)btn.getParent().getParent()).removeView(layout);
+            ((ViewManager) btn.getParent().getParent()).removeView(layout);
         });
         layout.addView(delete);
         box.addView(layout);
     }
+
+
 }

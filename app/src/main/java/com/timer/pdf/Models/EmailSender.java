@@ -3,20 +3,25 @@ package com.timer.pdf.Models;
 import android.util.Log;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.Security;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import javax.activation.CommandMap;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.activation.MailcapCommandMap;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -82,11 +87,17 @@ public class EmailSender {
                 new InternetAddress(DataKeeperKeeper.keeper.getOurEmail()));
         emailMessage.setSubject(emailSubject);
         MimeMultipart multipart = new MimeMultipart();
-        MimeBodyPart attachment = new MimeBodyPart();
-        attachment.attachFile(Generator.generate(keeper));
-        multipart.addBodyPart(attachment);
+
+        if (DataKeeperKeeper.currentFile == null) {
+            DataKeeperKeeper.currentFile = Generator.generate(keeper);
+        }
+        addAttachment(multipart, DataKeeperKeeper.currentFile);
+        for (File s : DataKeeperKeeper.pathList) {
+            addAttachment(multipart, s);
+        }
         emailMessage.setContent(multipart);
         Log.i("GMail", "Email Message created.");
+        DataKeeperKeeper.pathList = new ArrayList<>();
         return emailMessage;
     }
 
@@ -100,4 +111,11 @@ public class EmailSender {
         Log.i("GMail", "Email sent successfully.");
     }
 
+    private void addAttachment(Multipart multipart, File file) throws MessagingException {
+        DataSource source = new FileDataSource(file);
+        BodyPart messageBodyPart = new MimeBodyPart();
+        messageBodyPart.setDataHandler(new DataHandler(source));
+        messageBodyPart.setFileName(file.getName());
+        multipart.addBodyPart(messageBodyPart);
+    }
 }

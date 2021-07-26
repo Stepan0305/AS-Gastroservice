@@ -6,7 +6,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -17,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.sun.mail.util.MailConnectException;
 import com.timer.pdf.Models.DataKeeper;
 import com.timer.pdf.Models.DataKeeperKeeper;
 import com.timer.pdf.Models.EmailSender;
@@ -26,8 +29,9 @@ import com.timer.pdf.R;
 public class SignatureActivity2 extends AppCompatActivity {
     LinearLayout paintBox;
     PaintView paintView;
-    ImageButton btnClear, btnConfirm, btnBack;
+    ImageButton btnClear, btnConfirm, btnBack, btnPhoto;
     ProgressDialog pd;
+    boolean ok = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +48,10 @@ public class SignatureActivity2 extends AppCompatActivity {
         btnClear = findViewById(R.id.btnClear2);
         btnConfirm = findViewById(R.id.btnConfirm2);
         btnBack = findViewById(R.id.btnBack2);
+        btnPhoto = findViewById(R.id.btnPhoto);
+        if (DataKeeperKeeper.keeper.getOurSignature() != null){
+            new SendTask().execute(DataKeeperKeeper.keeper);
+        }
     }
 
     public void onTap2(View v){
@@ -51,7 +59,9 @@ public class SignatureActivity2 extends AppCompatActivity {
             paintView.path.reset();
             paintView.invalidate();
         } else if (v.getId() == btnConfirm.getId()){
-            DataKeeperKeeper.keeper.setOurSignature(paintView.viewToBitmap(paintView));
+            if (DataKeeperKeeper.keeper.getOurSignature() == null) {
+                DataKeeperKeeper.keeper.setOurSignature(paintView.viewToBitmap(paintView));
+            }
             //запрос разрешений
             if (ContextCompat.checkSelfPermission(SignatureActivity2.this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
@@ -63,6 +73,8 @@ public class SignatureActivity2 extends AppCompatActivity {
             }
         } else if (v.getId() == btnBack.getId()){
             finish();
+        } else if (v.getId() == btnPhoto.getId()){
+            startActivity(new Intent(this, AddPhotosActivity.class));
         }
     }
 
@@ -84,7 +96,21 @@ public class SignatureActivity2 extends AppCompatActivity {
                 sender.createEmailMessage();
                 sender.sendEmail();
 
-            } catch (Exception ex) {
+            } catch (MailConnectException mex){
+                mex.printStackTrace();
+                ok = false;
+//                AlertDialog.Builder alert = new AlertDialog.Builder(SignatureActivity2.this);
+//                alert.setTitle("Error!");
+//                alert.setMessage("Keine Internetverbindung. Datei im internen Speicher gespeichert.");
+//                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        Toast.makeText(SignatureActivity2.this, "text", Toast.LENGTH_LONG).show();
+//                    }
+//                });
+//                alert.create().show();
+            }
+            catch (Exception ex) {
                 ex.printStackTrace();
             }
             return null;
@@ -101,10 +127,33 @@ public class SignatureActivity2 extends AppCompatActivity {
             } finally {
                 pd = null;
             }
-            Toast.makeText(SignatureActivity2.this, "Сообщение отправлено", Toast.LENGTH_LONG).show();
-            Intent i = new Intent(SignatureActivity2.this, MainActivity.class);
-            startActivity(i);
-            finish();
+            if (ok) {
+                Toast.makeText(SignatureActivity2.this, "Сообщение отправлено", Toast.LENGTH_LONG).show();
+                Intent i = new Intent(SignatureActivity2.this, MainActivity.class);
+                startActivity(i);
+                finish();
+            } else {
+                AlertDialog.Builder alert = new AlertDialog.Builder(SignatureActivity2.this);
+                alert.setTitle("Error!");
+                alert.setMessage("Internet Verbindung fehlt. Datei befindet sich im Download Ordner.");
+                alert.setCancelable(false);
+
+                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent i = new Intent(SignatureActivity2.this, MainActivity.class);
+                        startActivity(i);
+                        finish();
+                    }
+                });
+                alert.setNegativeButton("Neu starten", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        recreate();
+                    }
+                });
+                alert.create().show();
+            }
         }
     }
 
