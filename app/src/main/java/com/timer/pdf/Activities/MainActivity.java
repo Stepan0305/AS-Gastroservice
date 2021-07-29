@@ -1,21 +1,28 @@
 package com.timer.pdf.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.timer.pdf.Models.DataKeeper;
@@ -55,15 +62,8 @@ public class MainActivity extends AppCompatActivity {
         btnNext = findViewById(R.id.btnNext);
         btnSettings = findViewById(R.id.btnSettings);
         timer = new Timer();
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
-        try {
-            Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.logo_big);
-            Generator.createFile(
-                    b,
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/logo.png"
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!hasPermission()){
+            requestPermission();
         }
 
     }
@@ -73,10 +73,10 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         DataKeeperKeeper.keeper = new DataKeeper();
         DataKeeperKeeper.currentFile = null;
-        if ( !PreferenceManager.getDefaultSharedPreferences(this).getString("ourData", "no").equals("no") ){
+        if (!PreferenceManager.getDefaultSharedPreferences(this).getString("ourData", "no").equals("no")) {
             DataKeeperKeeper.keeper.setOurData(PreferenceManager.getDefaultSharedPreferences(this).getString("ourData", "no"));
         }
-        if ( !PreferenceManager.getDefaultSharedPreferences(this).getString("ourEmail", "no").equals("no") ){
+        if (!PreferenceManager.getDefaultSharedPreferences(this).getString("ourEmail", "no").equals("no")) {
             DataKeeperKeeper.keeper.setOurEmail(PreferenceManager.getDefaultSharedPreferences(this).getString("ourEmail", "no"));
         }
     }
@@ -150,8 +150,51 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private boolean hasPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            int result2 = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA);
+            return Environment.isExternalStorageManager() && result2 == PackageManager.PERMISSION_GRANTED;
+        } else {
+            int result = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
+            int result1 = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int result2 = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA);
+            return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED
+                    && result2 == PackageManager.PERMISSION_GRANTED;
+        }
+    }
+
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                intent.addCategory("android.intent.category.DEFAULT");
+                intent.setData(Uri.parse(String.format("package:%s", getApplicationContext().getPackageName())));
+                startActivityForResult(intent, 2296);
+            } catch (Exception e) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivityForResult(intent, 2296);
+            }
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{
+                    Manifest.permission.CAMERA}, 1);
+        } else {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA}, 1);
+        }
+    }
+
+
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 2296) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (!Environment.isExternalStorageManager()) {
+                    Toast.makeText(this, "Allow permission for storage access!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 }

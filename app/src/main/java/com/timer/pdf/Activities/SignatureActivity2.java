@@ -11,9 +11,12 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -23,8 +26,11 @@ import com.sun.mail.util.MailConnectException;
 import com.timer.pdf.Models.DataKeeper;
 import com.timer.pdf.Models.DataKeeperKeeper;
 import com.timer.pdf.Models.EmailSender;
+import com.timer.pdf.Models.Generator;
 import com.timer.pdf.Models.PaintView;
 import com.timer.pdf.R;
+
+import java.io.IOException;
 
 public class SignatureActivity2 extends AppCompatActivity {
     LinearLayout paintBox;
@@ -32,6 +38,7 @@ public class SignatureActivity2 extends AppCompatActivity {
     ImageButton btnClear, btnConfirm, btnBack, btnPhoto;
     ProgressDialog pd;
     boolean ok = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,31 +56,34 @@ public class SignatureActivity2 extends AppCompatActivity {
         btnConfirm = findViewById(R.id.btnConfirm2);
         btnBack = findViewById(R.id.btnBack2);
         btnPhoto = findViewById(R.id.btnPhoto);
-        if (DataKeeperKeeper.keeper.getOurSignature() != null){
+        if (DataKeeperKeeper.keeper.getOurSignature() != null) {
             new SendTask().execute(DataKeeperKeeper.keeper);
+        }
+        try {
+            Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.logo_big);
+            Generator.createFile(
+                    b,
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/logo.png"
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public void onTap2(View v){
-        if (v.getId() == btnClear.getId()){
+    public void onTap2(View v) {
+        if (v.getId() == btnClear.getId()) {
             paintView.path.reset();
             paintView.invalidate();
-        } else if (v.getId() == btnConfirm.getId()){
+        } else if (v.getId() == btnConfirm.getId()) {
             if (DataKeeperKeeper.keeper.getOurSignature() == null) {
                 DataKeeperKeeper.keeper.setOurSignature(paintView.viewToBitmap(paintView));
             }
-            //запрос разрешений
-            if (ContextCompat.checkSelfPermission(SignatureActivity2.this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                new SendTask().execute(DataKeeperKeeper.keeper);
-            } else {
-                if(!ActivityCompat.shouldShowRequestPermissionRationale(SignatureActivity2.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-                    ActivityCompat.requestPermissions(SignatureActivity2.this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                }
-            }
-        } else if (v.getId() == btnBack.getId()){
+
+            new SendTask().execute(DataKeeperKeeper.keeper);
+
+        } else if (v.getId() == btnBack.getId()) {
             finish();
-        } else if (v.getId() == btnPhoto.getId()){
+        } else if (v.getId() == btnPhoto.getId()) {
             startActivity(new Intent(this, AddPhotosActivity.class));
         }
     }
@@ -96,7 +106,7 @@ public class SignatureActivity2 extends AppCompatActivity {
                 sender.createEmailMessage();
                 sender.sendEmail();
 
-            } catch (MailConnectException mex){
+            } catch (MailConnectException mex) {
                 mex.printStackTrace();
                 ok = false;
 //                AlertDialog.Builder alert = new AlertDialog.Builder(SignatureActivity2.this);
@@ -109,8 +119,7 @@ public class SignatureActivity2 extends AppCompatActivity {
 //                    }
 //                });
 //                alert.create().show();
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
             return null;

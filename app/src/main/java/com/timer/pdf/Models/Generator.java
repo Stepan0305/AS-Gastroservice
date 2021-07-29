@@ -215,7 +215,6 @@ public class Generator {
 
     public static void createFile(Bitmap bitmap, String path) throws IOException {
         File f = new File(path);
-        f.createNewFile();
         Log.d(path, bitmap.getAllocationByteCount() + "");
         //Convert bitmap to byte array
 
@@ -231,10 +230,7 @@ public class Generator {
     }
     private static String getFileName(){
         String res = new SimpleDateFormat("dd-MM-yyyy HH.mm.ss", Locale.getDefault()).format(new Date());
-//        for (int i = 0; i < 10; i++) {
-//            int randomNum = new Random().nextInt(123 - 97) + 97;
-//            res += (char)randomNum;
-//        }
+
         res += ".pdf";
         return res;
     }
